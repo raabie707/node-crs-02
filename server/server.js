@@ -134,21 +134,18 @@ app.post('/users/login',(req,res)=>{
         res.status(400).send();
     });
 
+});
 
-    // User.findOne({email: body.email}, (err,user)=>{
-    //     if(!user){
-    //         res.status(400).send('Email not registered');
-    //     }
-    //     bcrypt.compare(body.password,user.password,(err,result)=>{
-    //         if(result){
-    //             res.status(200).header('x-auth', user.tokens.token).send('Email and Passwords Match , Welcome');
+app.delete('/users/me/token',authenticate, (req,res)=>{
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+        
+    },
+    ()=>{
+        res.status(400).send();
+    })
+});
 
-    //         }else{
-    //             res.status(400).send('Email and Passwords Do Not Match , Try Again');
-    //         }
-    //     })
-    // })
-})
 
 app.listen(3000,()=>{
 
