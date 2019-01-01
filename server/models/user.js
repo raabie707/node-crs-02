@@ -80,6 +80,41 @@ UserSchema.statics.findByToken = function (token) {
     });
 }
 
+UserSchema.statics.findByCredintials = function(email,password){
+    
+    var User = this;
+
+    return User.findOne({email}).then((user)=>{
+        if(!user){
+            return Promise.reject();
+        }
+
+        return new Promise((resolve, reject)=>{
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (result) {
+                   resolve(user);
+                } else {
+                   reject();
+                }
+            });
+        });
+    });
+    
+    
+    // User.findOne({ email: body.email }, (err, user) => {
+    //     if (!user) {
+    //         res.status(400).send('Email not registered');
+    //     }
+        // bcrypt.compare(body.password, user.password, (err, result) => {
+        //     if (result) {
+        //         res.status(200).header('x-auth', user.tokens.token).send('Email and Passwords Match , Welcome');
+
+        //     } else {
+        //         res.status(400).send('Email and Passwords Do Not Match , Try Again');
+        //     }
+        // })
+}
+
 UserSchema.pre('save', function (next) {
     var user = this;
 

@@ -2,6 +2,8 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const { ObjectID } = require('mongodb');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+
 
 var { mongoose } = require('./db/mongoose');
 var {User}  = require('./models/user');
@@ -118,6 +120,34 @@ app.post('/users', (req, res) => {
 
 app.get('/users/me', authenticate, (req,res)=>{
    res.send(req.user);
+})
+//post users/login
+
+app.post('/users/login',(req,res)=>{
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredintials(body.email,body.password).then((user)=>{
+       return user.generateAuthToken().then((token)=>{
+           res.header('x-auth', token).send(user);
+       });
+    }).catch((e)=>{
+        res.status(400).send();
+    });
+
+
+    // User.findOne({email: body.email}, (err,user)=>{
+    //     if(!user){
+    //         res.status(400).send('Email not registered');
+    //     }
+    //     bcrypt.compare(body.password,user.password,(err,result)=>{
+    //         if(result){
+    //             res.status(200).header('x-auth', user.tokens.token).send('Email and Passwords Match , Welcome');
+
+    //         }else{
+    //             res.status(400).send('Email and Passwords Do Not Match , Try Again');
+    //         }
+    //     })
+    // })
 })
 
 app.listen(3000,()=>{
