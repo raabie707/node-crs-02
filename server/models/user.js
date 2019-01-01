@@ -37,13 +37,15 @@ var UserSchema = new mongoose.Schema({
     }],
 
 });
-
+//overriding a function to only return user id and email
 UserSchema.methods.toJSON= function(){
     var user = this;
     var userObj = user.toObject();
 
     return _.pick(userObj,['_id','email']);
 }
+
+//this functiontion generates Authentication Tokens to keep users logged in
 UserSchema.methods.generateAuthToken = function (){
 
     var user = this;
@@ -60,6 +62,7 @@ UserSchema.methods.generateAuthToken = function (){
     });
 };
 
+//this functiontion finds a user by its token
 
 UserSchema.statics.findByToken = function (token) {
     
@@ -79,7 +82,7 @@ UserSchema.statics.findByToken = function (token) {
         'tokens.access': 'auth',
     });
 }
-
+//this function find user by email and then validates their password 
 UserSchema.statics.findByCredintials = function(email,password){
     
     var User = this;
@@ -99,22 +102,9 @@ UserSchema.statics.findByCredintials = function(email,password){
             });
         });
     });
-    
-    
-    // User.findOne({ email: body.email }, (err, user) => {
-    //     if (!user) {
-    //         res.status(400).send('Email not registered');
-    //     }
-        // bcrypt.compare(body.password, user.password, (err, result) => {
-        //     if (result) {
-        //         res.status(200).header('x-auth', user.tokens.token).send('Email and Passwords Match , Welcome');
-
-        //     } else {
-        //         res.status(400).send('Email and Passwords Do Not Match , Try Again');
-        //     }
-        // })
 }
 
+//this function hashes a user's password before saving it 
 UserSchema.pre('save', function (next) {
     var user = this;
 
@@ -131,6 +121,7 @@ UserSchema.pre('save', function (next) {
     next();}
 });
 
+//this function removes a users token to log them out
 UserSchema.methods.removeToken = function(token){
     var user = this;
 
@@ -140,9 +131,10 @@ UserSchema.methods.removeToken = function(token){
         }
     });
 };
-
+//creating a mongoose user model
 var User = mongoose.model('User', UserSchema);
 
+//exporting modules
 module.exports = {
     User,
 };
